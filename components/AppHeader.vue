@@ -1,14 +1,31 @@
 <template>
   <div>
-    <SfHeader
+    <SfHeaderOverride
       class="sf-header--has-mobile-search"
       :class="{ 'header-on-top': isSearchOpen }"
     >
       <template #logo>
-        <HeaderLogo />
+        <div class="logo-wrapper">
+          <a class="logo-conteiner">
+            <img src="@/static/logo-dark.svg" alt="" class="logo-dark">
+            <!--          <img src="@/static/logo-light.svg" alt="" class="logo-light">-->
+          </a>
+        </div>
+      </template>
+      <template #search>
+<!--        <SfButton
+          :is-search-open="isSearchOpen"
+          @click="isSearchOpen = true"
+          @set-is-open="isSearchOpen = $event"
+          @set-search-results="productSearchResults = $event"
+        class="button_search">
+        <img src="@/static/icons/search.svg"
+             alt="" class="topbar-icons">
+        </SfButton>-->
+
       </template>
       <template #navigation>
-        <HeaderNavigation :category-tree="categoryTree" />
+          <HeaderNavigation :category-tree="categoryTree"/>
       </template>
       <template #aside>
         <div class="sf-header__switchers">
@@ -22,11 +39,24 @@
           />
         </div>
       </template>
+      <template #before_search>
+
+      </template>
       <template #header-icons="{ activeIcon }">
         <div class="sf-header__icons">
-          <SfButton
+          <div class="text">
+            <div>{{ $t('Eksperthjælp 09 - 20') }}</div>
+            <img src="@/static/icons/phone-a.svg" alt="" class="topbar-icons">
+            <div>+45 70 60 55 53</div>
+          </div>
+            <SearchBar
+              :is-search-open="isSearchOpen"
+              @set-is-open="isSearchOpen = $event"
+              @set-search-results="productSearchResults = $event"
+            />
+<!--          <SfButton
             v-e2e="'app-header-account'"
-            class="sf-button--pure sf-header__action"
+            class="sf-button&#45;&#45;pure sf-header__action"
             data-testid="accountIcon"
             aria-label="Account"
             @click="handleAccountClick"
@@ -40,10 +70,10 @@
                 'sf-header__icon is-active': activeIcon === 'account',
               }"
             />
-          </SfButton>
-          <SfButton
+          </SfButton>-->
+<!--          <SfButton
             v-if="isAuthenticated"
-            class="sf-button--pure sf-header__action"
+            class="sf-button&#45;&#45;pure sf-header__action"
             data-testid="wishlistIcon"
             aria-label="Wishlist"
             @click="toggleWishlistSidebar"
@@ -60,19 +90,20 @@
             />
             <SfBadge
               v-if="wishlistHasProducts"
-              class="sf-badge--number cart-badge"
+              class="sf-badge&#45;&#45;number cart-badge"
             >
               {{ wishlistItemsQty }}
             </SfBadge>
-          </SfButton>
-          <SfButton
-            v-e2e="'app-header-cart'"
-            class="sf-button--pure sf-header__action"
-            aria-label="Toggle cart sidebar"
-            @click="toggleCartSidebar"
-          >
-            <SvgImage
-              icon="empty_cart"
+          </SfButton>-->
+          <div class="cart-wrapper">
+            <SfButton
+              v-e2e="'app-header-cart'"
+              class="sf-button--pure sf-header__action"
+              aria-label="Toggle cart sidebar"
+              @click="toggleCartSidebar"
+            >
+<!--            <SvgImage
+              icon="cart_empty"
               :label="$t('Cart')"
               width="20"
               height="20"
@@ -80,24 +111,20 @@
               :class="{
                 'sf-header__icon is-active': activeIcon === 'cart',
               }"
-            />
-            <SfBadge
-              v-if="cartTotalItems"
-              class="sf-badge--number cart-badge"
-            >
-              {{ cartTotalItems }}
-            </SfBadge>
-          </SfButton>
+            />-->
+              <img src="@/static/icons/cart.svg" alt="" class="topbar-icons">
+              <SfBadge
+                v-if="cartTotalItems"
+                class="sf-badge--number cart-badge"
+              >
+                {{ cartTotalItems }}
+              </SfBadge>
+            </SfButton>
+          </div>
         </div>
       </template>
-      <template #search>
-        <SearchBar
-          :is-search-open="isSearchOpen"
-          @set-is-open="isSearchOpen = $event"
-          @set-search-results="productSearchResults = $event"
-        />
-      </template>
-    </SfHeader>
+
+    </SfHeaderOverride>
     <SearchResults
       v-if="isSearchOpen"
       :visible="isSearchOpen"
@@ -136,9 +163,12 @@ import type { CategoryTree, ProductInterface } from '~/modules/GraphQL/types';
 import HeaderLogo from '~/components/HeaderLogo.vue';
 import SvgImage from '~/components/General/SvgImage.vue';
 import { useTopBar } from './TopBar/useTopBar';
+import Marquee from './Header/Navigation/TopMessage.vue';
+import SfHeaderOverride from "~/src/theme/CustomHeader.vue";
 
 export default defineComponent({
   components: {
+    SfHeaderOverride,
     HeaderNavigation,
     SfHeader,
     SfOverlay,
@@ -146,12 +176,18 @@ export default defineComponent({
     SvgImage,
     SfButton,
     SfBadge,
+    Marquee,
     CurrencySelector: () => import('~/components/CurrencySelector.vue'),
     StoreSwitcher: () => import('~/components/StoreSwitcher.vue'),
     SearchBar: () => import('~/components/Header/SearchBar/SearchBar.vue'),
     SearchResults: () => import(
       /* webpackPrefetch: true */ '~/components/Header/SearchBar/SearchResults.vue'
     ),
+  },
+  data() {
+    return {
+      iconPath: '../static/icons/cart.svg'
+    }
   },
   setup() {
     const router = useRouter();
@@ -193,10 +229,10 @@ export default defineComponent({
     onMounted(async () => {
       if (app.$device.isDesktop) {
         await loadCartTotalQty();
-        // eslint-disable-next-line promise/catch-or-return
         await loadWishlistItemsCount();
       }
     });
+
 
     return {
       accountIcon,
@@ -225,12 +261,62 @@ export default defineComponent({
   @include for-desktop {
     --header-padding: 0 var(--spacer-sm);
   }
+  &__header{
+
+  }
 
   &__switchers {
     display: flex;
   }
 }
-
+.text {
+  display: flex;
+  align-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin: 0 10px;
+}
+.text div {
+  margin: 0 10px;
+}
+.cart-wrapper {
+  .sf-button {
+    margin: 0;
+    padding: 12px 5px;
+  }
+}
+.logo-conteiner {
+  max-width: 250px;
+  width: 100%;
+  text-align: center;
+  img{
+    height: 25px;
+  }
+}
+.sf-header__icons {
+  .sf-header__search{
+    margin-top: 5px;
+  }
+}
+.sf-input.sf-search-bar.sf-header__search {
+  border-bottom: 0;
+  max-width: 45px;
+}
+.sf-input.sf-search-bar.sf-header__search>div {
+  margin: 10px 0px 0;
+}
+.button_search {
+  background: transparent;
+}
+.sf-link.sf-header-navigation-item__link.nav-item {
+  padding-left: 0;
+}
+.sf-header__wrapper {
+  background: unset!important;
+}
+.sf-header__header{
+  max-width: 100%!important;
+}
 .header-on-top {
   z-index: 2;
 }

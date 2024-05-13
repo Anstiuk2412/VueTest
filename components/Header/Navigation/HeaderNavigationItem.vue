@@ -8,7 +8,7 @@
       v-if="hasChildren"
       icon="chevron_down"
       size="xxs"
-      color="green-primary"
+      color="black-primary"
       viewBox="0 0 24 24"
       :coverage="1"
     />

@@ -1,0 +1,7 @@
+:global(.sf-header__header) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%!important;
+  margin: var(--header-margin,0 auto);
+}

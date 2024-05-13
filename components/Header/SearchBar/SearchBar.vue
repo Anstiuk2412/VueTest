@@ -1,7 +1,6 @@
 <template>
   <SfSearchBar
     v-click-outside="closeSearch"
-    :placeholder="$t('Search for items')"
     aria-label="Search"
     class="sf-header__search"
     :value="term"
@@ -39,8 +38,8 @@
           <SvgImage
             icon="search"
             :label="$t('Search')"
-            width="18"
-            height="18"
+            width="22"
+            height="22"
           />
         </span>
       </SfButton>
@@ -177,4 +176,5 @@ export default defineComponent({
   right: 20px;
   bottom: 0;
 }
+
 </style>

@@ -1,7 +1,10 @@
 <template>
   <div
     class="header-navigation"
+    :class="{ fixed: isFixed }"
     @mouseleave="setCurrentCategory(null)"
+    v-bind:ref="myElement"
+    @scroll="handleScroll"
   >
     <div class="sf-header-navigation-item__item sf-header-navigation-item__item--desktop">
       <HeaderNavigationItem
@@ -34,17 +37,19 @@
 </template>
 <script lang="ts">
 import {
-  defineComponent, PropType, ref,
+  defineComponent, PropType, ref, onMounted, onBeforeUnmount
 } from '@nuxtjs/composition-api';
 
 import { CategoryTree } from '~/modules/GraphQL/types';
 import { useUiHelpers } from '~/composables';
 import type { ComponentTemplateRef } from '~/types/componentTemplateRef';
 import HeaderNavigationItem from './HeaderNavigationItem.vue';
+import HeaderLogo from "~/components/HeaderLogo.vue";
 
 export default defineComponent({
   name: 'HeaderNavigation',
   components: {
+    HeaderLogo,
     HeaderNavigationSubcategories: () => import('~/components/Header/Navigation/HeaderNavigationSubcategories.vue'),
     HeaderNavigationItem,
   },
@@ -62,6 +67,8 @@ export default defineComponent({
     const hasFocus = ref(false);
     let lvl0CatFocusIdx = 0;
     let focusedElement : HTMLElement | null = null;
+    const myElement = ref(null);
+    let isFixed = ref(false);
 
     const setCurrentCategory = (category: CategoryTree | null) => {
       currentCategory.value = category;
@@ -79,6 +86,20 @@ export default defineComponent({
       setCurrentCategory(null);
       if (focusedElement !== null) focusedElement.focus();
     };
+
+    const handleScroll = () => {
+      if (myElement.value) {
+        isFixed.value = myElement.value.scrollTop > 100;
+      }
+    }
+
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
 
     const navRight = () => {
       lvl0CatFocusIdx++;
@@ -118,6 +139,9 @@ export default defineComponent({
       navLeft,
       hasFocus,
       onMouseEnter,
+      handleScroll,
+      isFixed,
+      myElement
     };
   },
 });
@@ -127,6 +151,16 @@ export default defineComponent({
   &__main {
     display: flex;
   }
+}
+.sf-header__header {
+  margin: 0;
+  max-width: 100%;
+  --header-width: 100%;
+}
+.fixed {
+  position: fixed;
+  top: 0;
+  right: 0;
 }
 .nav-item {
   --header-navigation-item-margin: 0 var(--spacer-sm);

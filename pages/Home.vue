@@ -248,14 +248,15 @@ export default defineComponent({
   box-sizing: border-box;
   padding: 0 var(--spacer-sm);
   @include for-desktop {
-    max-width: 1240px;
+    max-width: 100%;
     padding: 0;
     margin: 0 auto;
   }
 }
 
 .hero-section {
-  margin: var(--spacer-xl) auto var(--spacer-lg);
+  /*margin: var(--spacer-xl) auto var(--spacer-lg);*/
+  margin: -85px 0 0 0!important;
 
   ::v-deep .sf-link:hover {
     color: var(--c-white);
